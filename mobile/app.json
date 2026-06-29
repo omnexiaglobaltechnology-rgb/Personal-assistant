@@ -19,11 +19,6 @@
     },
     "plugins": [
       "./plugins/withAndroidAgenticService"
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "73c86767-bb8b-43a1-a25e-8bbd9bdb638b"
-      }
-    }
+    ]
   }
 }
