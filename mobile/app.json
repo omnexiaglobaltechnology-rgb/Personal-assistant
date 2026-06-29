@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "Agentic Voice Assistant",
-    "slug": "agentic-voice-assistant",
+    "name": "PA",
+    "slug": "pa",
+    "owner": "omnexiatechnologys-organization",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
@@ -19,6 +20,11 @@
     },
     "plugins": [
       "./plugins/withAndroidAgenticService"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "73c86767-bb8b-43a1-a25e-8bbd9bdb638b"
+      }
+    }
   }
 }
