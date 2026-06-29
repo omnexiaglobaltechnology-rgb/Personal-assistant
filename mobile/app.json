@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Agentic Voice Assistant",
+    "slug": "agentic-voice-assistant",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "android": {
+      "package": "com.agentic.assistant",
+      "permissions": [
+        "RECORD_AUDIO",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_MICROPHONE",
+        "SYSTEM_ALERT_WINDOW",
+        "REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+        "WAKE_LOCK",
+        "RECEIVE_BOOT_COMPLETED"
+      ]
+    },
+    "plugins": [
+      "./plugins/withAndroidAgenticService"
+    ]
+  }
+}
