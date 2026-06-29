@@ -5,6 +5,13 @@ import { AutomationPipeline, ActionStep } from '../services/api';
 
 const { AgenticAccessibility } = NativeModules;
 
+let shouldCancelPipeline = false;
+
+export function cancelPipelineExecution() {
+  shouldCancelPipeline = true;
+  Speech.stop();
+}
+
 /**
  * VM-like interpreter to execute multi-step automation pipelines.
  * Supports conditions, multi-tasking, nested loops, TTS and voice input feedback loops.
@@ -17,6 +24,7 @@ export async function executePipeline(
   onLog(`[Pipeline Started] ID: ${pipeline.pipeline_id}`);
   onLog(`[Explanation] ${pipeline.explanation}`);
 
+  shouldCancelPipeline = false; // Reset cancellation flag
   const steps = pipeline.steps;
   let ip = 0; // Instruction Pointer pointing to step index
 
@@ -37,6 +45,10 @@ export async function executePipeline(
   };
 
   while (ip < steps.length) {
+    if (shouldCancelPipeline) {
+      onLog('[Pipeline Cancelled] Stopped by user command.');
+      break;
+    }
     const step = steps[ip];
     onLog(`[Step ${step.step_id}] Executing ${step.action}...`);
 

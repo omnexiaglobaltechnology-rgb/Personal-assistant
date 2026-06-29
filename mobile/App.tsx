@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { processTranscript, AutomationPipeline } from './src/services/api';
-import { executePipeline } from './src/utils/pipelineExecutor';
+import { executePipeline, cancelPipelineExecution } from './src/utils/pipelineExecutor';
 import { NativeModules } from 'react-native';
 
 const { AgenticAccessibility } = NativeModules;
@@ -51,6 +51,15 @@ export default function App() {
       'onVoiceCommand',
       (transcript: string) => {
         addLog(`[Heard Broadcast] "${transcript}"`);
+        
+        // INTERRUPT/STOP TRIGGER
+        const cleanText = transcript.trim().toLowerCase();
+        if (cleanText === 'stop' || cleanText === 'stop service' || cleanText === 'cancel') {
+          addLog('Stopping execution and speech output...');
+          cancelPipelineExecution();
+          return;
+        }
+
         handleCommand(transcript);
       }
     );
@@ -136,6 +145,14 @@ export default function App() {
   };
 
   const handleCommand = async (command: string) => {
+    const cleanText = command.trim().toLowerCase();
+    if (cleanText === 'stop' || cleanText === 'stop service' || cleanText === 'cancel') {
+      addLog('Stopping execution and speech output...');
+      cancelPipelineExecution();
+      setIsProcessing(false);
+      return;
+    }
+
     if (isProcessing) return;
     setIsProcessing(true);
     addLog(`Sending to Gemini Context Planner: "${command}"...`);
