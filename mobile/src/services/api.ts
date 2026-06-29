@@ -3,7 +3,7 @@
  */
 
 // Replace with your Render URL or local development IP
-const BACKEND_URL = 'https://agentic-voice-assistant-backend.onrender.com';
+const BACKEND_URL = 'https://personal-assistant-2-ytjx.onrender.com';
 
 export interface ActionStep {
   step_id: number;
