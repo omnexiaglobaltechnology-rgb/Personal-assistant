@@ -20,6 +20,11 @@
     },
     "plugins": [
       "./plugins/withAndroidAgenticService"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "fbe7238d-caa0-4102-be09-ac1016974ab2"
+      }
+    }
   }
 }
