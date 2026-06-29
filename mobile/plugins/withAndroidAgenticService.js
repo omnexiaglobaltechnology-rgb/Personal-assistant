@@ -160,10 +160,17 @@ function withAndroidAgenticService(config) {
         // Add package to getPackages list
         if (content.includes('override fun getPackages(): List<ReactPackage>')) {
           if (!content.includes('AgenticAccessibilityPackage()')) {
-            content = content.replace(
-              /PackageList\(this\)\.packages\.apply\s*\{\s*([\s\S]*?)\}/,
-              `PackageList(this).packages.apply {\n      add(AgenticAccessibilityPackage())\n      $1}`
-            );
+            if (content.includes('return PackageList(this).packages')) {
+              content = content.replace(
+                /return PackageList\(this\)\.packages/,
+                'return PackageList(this).packages.toMutableList().apply {\n          add(AgenticAccessibilityPackage())\n        }'
+              );
+            } else {
+              content = content.replace(
+                /PackageList\(this\)\.packages\.apply\s*\{\s*([\s\S]*?)\}/,
+                `PackageList(this).packages.apply {\n      add(AgenticAccessibilityPackage())\n      $1}`
+              );
+            }
           }
         }
 
