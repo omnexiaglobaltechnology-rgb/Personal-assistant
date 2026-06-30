@@ -117,6 +117,15 @@ def get_flat_json_schema(model_class):
     
     def resolve_refs(node):
         if isinstance(node, dict):
+            node.pop("title", None)
+            node.pop("default", None)
+            
+            if "anyOf" in node:
+                any_of_list = node.pop("anyOf")
+                non_null_type = next((item for item in any_of_list if item.get("type") != "null"), None)
+                if non_null_type:
+                    node.update(resolve_refs(non_null_type))
+                    
             if "$ref" in node:
                 ref_path = node["$ref"]
                 ref_name = ref_path.split("/")[-1]
