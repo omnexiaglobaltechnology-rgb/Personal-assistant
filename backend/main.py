@@ -178,7 +178,7 @@ async def process_transcript(payload: ProcessRequest):
                 PipelineStep(
                     step_id=1,
                     action=ActionType.SPEAK,
-                    params=StepParams(text_content=f"Sorry, I had trouble processing that command. {error_msg}")
+                    params=StepParams(text_content="Sorry, I had trouble processing that command. Please try again.")
                 )
             ]
         )
