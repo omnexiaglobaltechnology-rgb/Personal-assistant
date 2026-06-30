@@ -2,8 +2,8 @@
  * API client to interact with the FastAPI backend.
  */
 
-// Replace with your Render URL or local development IP
-const BACKEND_URL = 'https://personal-assistant-2-ytjx.onrender.com';
+// Replace with your Vercel URL or local development IP
+const BACKEND_URL = 'https://personal-assistant-iota-blush.vercel.app';
 
 export interface ActionStep {
   step_id: number;
