@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { processTranscript, AutomationPipeline } from './src/services/api';
-import { executePipeline, cancelPipelineExecution } from './src/utils/pipelineExecutor';
+import { executePipeline, cancelPipelineExecution, lastSpeakEndTime } from './src/utils/pipelineExecutor';
 import { NativeModules } from 'react-native';
 
 const { AgenticAccessibility } = NativeModules;
@@ -57,6 +57,13 @@ export default function App() {
         if (cleanText === 'stop' || cleanText === 'stop service' || cleanText === 'cancel') {
           addLog('Stopping execution and speech output...');
           cancelPipelineExecution();
+          return;
+        }
+
+        // COOLDOWN SHIELD: Ignore voice commands recognized within 3.5 seconds of last TTS speech completion
+        const timeSinceLastSpeak = Date.now() - lastSpeakEndTime;
+        if (timeSinceLastSpeak < 3500) {
+          addLog(`[Shield] Ignored voice feedback loop (heard "${transcript}" within ${timeSinceLastSpeak}ms of TTS end)`);
           return;
         }
 

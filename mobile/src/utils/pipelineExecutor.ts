@@ -6,6 +6,7 @@ import { AutomationPipeline, ActionStep } from '../services/api';
 const { AgenticAccessibility } = NativeModules;
 
 let shouldCancelPipeline = false;
+export let lastSpeakEndTime = 0;
 
 export function cancelPipelineExecution() {
   shouldCancelPipeline = true;
@@ -226,10 +227,14 @@ export async function executePipeline(
 function speakText(text: string): Promise<void> {
   return new Promise((resolve) => {
     Speech.speak(text, {
-      onDone: () => resolve(),
+      onDone: () => {
+        lastSpeakEndTime = Date.now();
+        resolve();
+      },
       onError: (err) => {
         console.error('[Speech Error] TTS failure:', err);
-        resolve(); // Continue execution despite TTS failure
+        lastSpeakEndTime = Date.now();
+        resolve();
       },
     });
   });
