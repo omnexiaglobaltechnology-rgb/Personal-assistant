@@ -139,17 +139,17 @@ async def process_transcript(payload: ProcessRequest):
         return pipeline
 
     except Exception as e:
-        print(f"Error processing transcript: {str(e)}")
-        # Fallback pipeline if Gemini model execution fails
+        error_msg = f"Exception: {str(e)}"
+        print(f"Error processing transcript: {error_msg}")
         fallback_id = str(uuid.uuid4())
         return AutomationPipeline(
             pipeline_id=fallback_id,
-            explanation="I encountered an error planning your task. Let's try direct call or note.",
+            explanation=error_msg,
             steps=[
                 PipelineStep(
                     step_id=1,
                     action=ActionType.SPEAK,
-                    params=StepParams(text_content="Sorry, I had trouble processing that command. Please try again.")
+                    params=StepParams(text_content=f"Sorry, I had trouble processing that command. {error_msg}")
                 )
             ]
         )
