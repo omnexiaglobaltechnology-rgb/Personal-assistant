@@ -12,10 +12,11 @@ import {
   ActivityIndicator,
   Modal,
   Platform,
+  PermissionsAndroid,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { processTranscript, AutomationPipeline } from './src/services/api';
-import { executePipeline, cancelPipelineExecution, lastSpeakEndTime } from './src/utils/pipelineExecutor';
+import { executePipeline, cancelPipelineExecution, ttsState } from './src/utils/pipelineExecutor';
 import { NativeModules } from 'react-native';
 
 const { AgenticAccessibility } = NativeModules;
@@ -61,7 +62,7 @@ export default function App() {
         }
 
         // COOLDOWN SHIELD: Ignore voice commands recognized within 3.5 seconds of last TTS speech completion
-        const timeSinceLastSpeak = Date.now() - lastSpeakEndTime;
+        const timeSinceLastSpeak = Date.now() - ttsState.lastSpeakEndTime;
         if (timeSinceLastSpeak < 3500) {
           addLog(`[Shield] Ignored voice feedback loop (heard "${transcript}" within ${timeSinceLastSpeak}ms of TTS end)`);
           return;
@@ -113,6 +114,23 @@ export default function App() {
         setIsServiceActive(false);
         addLog('Background Voice Listener stopped.');
       } else {
+        // Request Microphone permission before starting foreground service (Android 14 requirement)
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          {
+            title: 'Microphone Permission',
+            message: 'PA needs access to your microphone to listen for voice commands.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          }
+        );
+
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          addLog('Microphone permission denied. Cannot start background listener.');
+          return;
+        }
+
         await AgenticAccessibility.startVoiceService();
         setIsServiceActive(true);
         addLog('Background Voice Listener active. Listening 24/7...');
