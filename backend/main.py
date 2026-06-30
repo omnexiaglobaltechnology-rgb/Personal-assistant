@@ -111,6 +111,25 @@ Rules:
 - When generating gestures, assume standard screen coordinate bounds (e.g. 1080x2400). A down scroll swipe can go from (540, 1800) to (540, 600) with a 400ms duration.
 - Write a clear, short user-facing explanation of what you are doing in the `explanation` field.
 """
+def get_flat_json_schema(model_class):
+    schema = model_class.model_json_schema()
+    defs = schema.pop("$defs", {})
+    
+    def resolve_refs(node):
+        if isinstance(node, dict):
+            if "$ref" in node:
+                ref_path = node["$ref"]
+                ref_name = ref_path.split("/")[-1]
+                ref_schema = defs[ref_name]
+                return resolve_refs(ref_schema)
+            else:
+                return {k: resolve_refs(v) for k, v in node.items()}
+        elif isinstance(node, list):
+            return [resolve_refs(item) for item in node]
+        else:
+            return node
+            
+    return resolve_refs(schema)
 
 @app.post("/api/v1/assistant/process", response_model=AutomationPipeline)
 async def process_transcript(payload: ProcessRequest):
@@ -121,13 +140,14 @@ async def process_transcript(payload: ProcessRequest):
             user_message += f"\nDevice Context: {payload.context}"
 
         # Request Gemini with structured schema enforcing Pydantic model
+        flat_schema = get_flat_json_schema(AutomationPipeline)
         response = client.models.generate_content(
             model='gemini-1.5-flash',
             contents=user_message,
             config=types.GenerateContentConfig(
                 system_instruction=SYSTEM_INSTRUCTION,
                 response_mime_type="application/json",
-                response_schema=AutomationPipeline,
+                response_schema=flat_schema,
                 temperature=0.1  # Low temperature for deterministic planning
             )
         )
