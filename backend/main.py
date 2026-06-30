@@ -151,7 +151,7 @@ async def process_transcript(payload: ProcessRequest):
         # Request Gemini with structured schema enforcing Pydantic model
         flat_schema = get_flat_json_schema(AutomationPipeline)
         response = client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='gemini-2.5-flash',
             contents=user_message,
             config=types.GenerateContentConfig(
                 system_instruction=SYSTEM_INSTRUCTION,
@@ -185,4 +185,4 @@ async def process_transcript(payload: ProcessRequest):
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "model": "gemini-1.5-flash"}
+    return {"status": "healthy", "model": "gemini-2.5-flash"}
